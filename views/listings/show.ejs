@@ -1,0 +1,22 @@
+<% layout("/layouts/boilerplate") %>
+
+
+<body>
+    <h1>Single property Page</h1>
+
+    <ul>
+        <li>Title: <%= data.title %></li>
+        <li>Description: <%= data.description %></li>
+        <li> Price:  &#8377;  <%= data.price ? Number(data.price).toLocaleString("en-IN") : "N/A" %></li>
+        <li>Image: <%=data.image%> </li>
+        <li>Location: <%= data.location %></li>
+         <li>Country: <%= data.country %></li>
+    </ul>
+    <form action="/listings/<%=data._id%>/edit" method="get" >
+                <button>Edit</button>
+            </form>
+
+            <form action="/listings/<%=data._id%>?_method=DELETE" method="post" >
+                <button>Delete</button>
+            </form>
+</body>

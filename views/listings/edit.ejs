@@ -1,0 +1,55 @@
+<% layout("/layouts/boilerplate") %>
+
+<body>
+    
+    <div class="row mt-3">
+    <div class="col-6 offset-3" >
+        <h1>Edit Listing Page</h1><br>
+        <form action="/listings/<%= data._id %>?_method=PUT" method="post">
+
+            <div class="mb-3">
+            <label for="title">Title: </label>
+            <input type="text" class="form-control" name="title" placeholder="Enter Title" value="<%=data.title  %>">
+            </div>
+           
+            <div class="mb-3">
+            <label for="description">Description: </label>
+            <textarea name="description" class="form-control" id="description" placeholder="Enter Description"><%=data.description  %></textarea> <br>
+            </div>
+
+            <div class="mb-3">
+            <label for="image">Image: </label>
+            <input type="text" class="form-control" name="image[url]" placeholder="Enter URL/link" value="<%=data.image.url%>">
+            </div>
+
+           <div class="row">
+            <div class="mb-3  col-md-5">
+            <label for="price">Price: </label>
+            <input type="number" class="form-control" name="price" placeholder="Enter Price" value="<%=data.price%>" >
+           </div>
+
+            <div class="mb-3 col-md-7">
+            <label for="country">Country: </label>
+            <input type="text" class="form-control" name="country" placeholder="Enter Country" value="<%=data.country  %>">
+            </div>
+            </div>
+
+            <div class="mb-3">
+            <label for="location">Location: </label>
+            <input type="text" class="form-control" name="location" placeholder="Enter location" value="<%=data.location  %>">
+            </div>
+
+        
+            <!-- //update button  -->
+             <div class="btn-design" >
+             <div  class=" mb-5 col-2 offset-5 " >
+             <button class="form-control">Update</button>
+             </div>
+             </div>
+    
+        </form>
+    </div>
+    </div>
+
+</body>
+</html>

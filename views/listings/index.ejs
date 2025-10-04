@@ -1,0 +1,48 @@
+<% layout("/layouts/boilerplate")  %>
+
+<body>
+    
+     <!-- <form action="/listings/new" method="get">
+            <button>Create New Listing</button>
+        </form> -->
+       
+        <div class="row row-cols-lg-4 row-cols-md-2 row-cols-sm-1">
+        <% for(let data of alldata){ %>
+        <a  href="/listings/<%=data.id%> " class="card-link">
+        <div class="card "  >
+        <img src="<%=data.image.url  %>" class="card-img-top" alt="listing-img" style="width: 20rem; height: 15rem;" >
+        <div class="card-img-overlay"></div>
+            <div class="card-body">
+                <b><p class="card-text"><%=data.title %></b> 
+                <br>
+                &#8377;<%=data.price ? Number(data.price).toLocaleString("en-IN") : "N/A" %>/Night</p>
+                
+            </div>
+        </div>
+        </a>
+
+         <% } %>
+         </div>
+      
+        
+<!-- 
+    <ul>
+       <% for(let data of alldata){ %>
+       
+        <div class="property">
+            <li class="no-bullet"> <img id="imageSet" src="<%=data.image.url  %>" alt="image"></li>
+            <li>Title:<a href="/listings/<%=data._id%>"><%=data.title  %></a> </li>
+             <li>Description: <%= data.description %></li>
+           
+            <li>Price: <%=data.price  %></li>
+            <li>Location: <%=data.location  %></li>
+            <li>Country: <%=data.country  %></li> 
+            
+        </div>
+        <br>
+        
+   <% } %>
+
+    </ul>
+     -->
+</body>
