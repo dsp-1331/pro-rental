@@ -123,3 +123,24 @@ list-style-type: none;
     color: #ebebeb;
     border: none !important;
    }
+
+   /* show page styling  */
+   .show-img{
+    height: 40vh;
+    object-fit: cover !important;
+    
+   }
+
+   .show-btn{
+    display: flex;
+  
+   }
+
+   .show-card{
+    padding-left: 0;
+    padding-right: 0;
+   }
+
+
+  
+   

@@ -2,21 +2,43 @@
 
 
 <body>
-    <h1>Single property Page</h1>
+     <div class="row">
+            <div class="col-8 offset-3">
+                <h1><%=data.title%> </h1>
+             </div>
 
-    <ul>
-        <li>Title: <%= data.title %></li>
-        <li>Description: <%= data.description %></li>
-        <li> Price:  &#8377;  <%= data.price ? Number(data.price).toLocaleString("en-IN") : "N/A" %></li>
-        <li>Image: <%=data.image%> </li>
-        <li>Location: <%= data.location %></li>
-         <li>Country: <%= data.country %></li>
-    </ul>
-    <form action="/listings/<%=data._id%>/edit" method="get" >
-                <button>Edit</button>
-            </form>
+    <div class="card col-6 offset-3 show-card" >
+       
+        <img src="<%=data.image.url%>" class="card-img-top show-img" alt="property image">
+        <div class="card-body">
+            <h5 class="card-title"><%= data.title %></h5>
+            <p class="card-text">
+                <%= data.description %> <br>
+                &#8377;  <%= data.price ? Number(data.price).toLocaleString("en-IN") : "N/A" %> <br>
+                <%= data.location %> <br>
+                <%= data.country %> <br>
+            </p>
+           
+        </div>
 
-            <form action="/listings/<%=data._id%>?_method=DELETE" method="post" >
-                <button>Delete</button>
-            </form>
+
+    </div>
+
+        
+    
+           
+    </div>
+
+    <div class="show-btn offset-3 mb-5">
+
+        <a href="/listings/<%=data._id%>/edit" class="btn btn-dark col-md-1 ">Edit</a>
+
+        <form action="/listings/<%=data._id%>?_method=DELETE" method="post" >
+                        <button class="btn btn-dark offset-md-3">Delete</button>
+        </form>  
+           
+        
+    </div>
+    
+    
 </body>
