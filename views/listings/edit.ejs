@@ -40,7 +40,7 @@
             <div class="mb-3  col-md-5">
             <label for="price" class="form-label">Price: </label>
             <input type="number" class="form-control" name="listing[price]" 
-             value="<%= data.price %>" required >
+             value="<%= data.price %>" required min="0" >
              <div class="invalid-feedback">Enter the valid Price</div>
            </div>
 

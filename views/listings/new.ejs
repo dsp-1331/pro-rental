@@ -22,19 +22,24 @@
                 <div class="invalid-feedback">Please enter the short Description</div>
             </div>
            
-            <!-- //Image of location -->
+            <!-- Image section -->
             <div class="mb-3">
-                 <label for="image" class="form-label">Image: </label>
-                <input type="text" name="listing[image]" placeholder="Enter URL/link" class="form-control" >
-                <div class="invalid-feedback">Please enter the Image of Property</div>
+                 <label for="image" class="form-label">Image URL: </label>
+                <input type="url" name="listing[image]" placeholder="Enter image URL(jpg, png, etc.)" 
+                class="form-control" 
+                pattern="https?://.+\.(jpg|jpeg|png|gif|webp|avif)(\?.*)?"
+                title="Link must end with an image extension like .jpg or .png"
+                >
+                 <div class="invalid-feedback">Please enter a valid image link (ending in .jpg, .png, etc.)</div>
+                
             </div>
 
             <!-- //Price  -->
             <div class="row">
              <div class="mb-3 col-md-4" >
                 <label for="price" class="form-label">Price: </label>
-                <input type="number" name="listing[price]" placeholder="12000" class="form-control" required>
-                <div class="invalid-feedback">Please enter the valid Price</div>
+                <input type="number" name="listing[price]" placeholder="12000" class="form-control" required min="0">
+                <div class="invalid-feedback">Price should be a positive number</div>
             </div>
             
             <!-- //Country -->
@@ -55,7 +60,7 @@
             
             <div class="btn-design">
             <div class="mb-5  col-2 offset-5" >
-                <button class="form-control" class="btn btn-dark">Add</button>
+                <button class="form-control btn btn-dark">Add</button>
             </div>
             </div>
            
