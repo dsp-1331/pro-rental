@@ -11,17 +11,38 @@ const listSchema= new Schema({
         type:String
     },
    
+//     image: {
+//     filename: {
+//       type: String,
+//       default: "listingimage",
+//     },
+//     url: {
+//       type: String,
+//       default:
+//         "https://clubmahindra.gumlet.io/blog/media/section_images/shuttersto-6d71496a31ac52b.jpg?w=376&dpr=2.6",
+//     }
+// },
+
     image: {
-    filename: {
-      type: String,
-      default: "listingimage",
+        filename: {
+            type: String,
+            default: "listingimage",
+        },
+        url: {
+            type: String,
+            default: "https://gumlet.io",
+            // 1. Setter: If user sends an empty string, it forces Mongoose to use the default
+            set: (v) => v === "" 
+                ? "https://gumlet.io" 
+                : v,
+            // 2. Validator: Ensures the string looks like an image link
+            match: [
+                /\.(jpg|jpeg|png|gif|webp|avif)(\?.*)?$/i,
+                "Please enter a valid image URL (jpg, png, etc.)"
+            ]
+        }
     },
-    url: {
-      type: String,
-      default:
-        "https://clubmahindra.gumlet.io/blog/media/section_images/shuttersto-6d71496a31ac52b.jpg?w=376&dpr=2.6",
-    }
-},
+
 
     price:{
         type:Number,

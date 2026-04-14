@@ -128,9 +128,10 @@ app.get("/listings/:id/edit",async(req,res)=>{
 
 //Update data
 app.put("/listings/:id",async(req,res)=>{
-    let data=req.body;
+    // let data=req.body.listing;
     let {id}= req.params;
-    await Listing.findByIdAndUpdate(id,data,{runValidators:true});
+    //Extract object:  req.body.listing
+    await Listing.findByIdAndUpdate(id,{ ...req.body.listing },{runValidators:true});
     res.redirect(`/listings/${id}`);
 });
 
