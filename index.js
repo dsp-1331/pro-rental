@@ -26,6 +26,11 @@ app.set("view engine","ejs");
 //to parse the data from url
 app.use(express.urlencoded({extended:true}));
 
+//import wrapAsync
+const wrapAsync= require("./utils/wrapAsync.js");
+
+//import ExpressError
+const ExpressError= require("./utils/ExpressError.js");
 
 const Listing= require("./models/list.js");
 main()
@@ -40,36 +45,16 @@ app.get("/",(req,res)=>{
     res.send("I am root");
 });
 
-// app.get("/test",async(req,res)=>{
-//     let list2= new Listening({
-//         title:"Goa",
-//         desc:"This is Goa property" ,
-        
-//         price: 20000,
-//         loc: "Goa, India",
-//         country: "India",
-//     });
-//     //  list1.save()
-//     //  .then((res)=>{
-//     //     console.log(res);
-//     //  })
-//     //  .catch((err)=>{
-//     //     console.log(err);
-//     //  })
 
-//     await list2.save();
-//     console.log("data saved");
-//     res.send("data saved");
-// });
 
 
 //Index Route
-app.get("/listings",async(req,res)=>{
+app.get("/listings",wrapAsync(async(req,res)=>{
    let alldata= await Listing.find();
 //    console.log(alldata);
    res.render("listings/index.ejs",{alldata});
 
-});
+}));
 
 //Create route
 app.get("/listings/new",(req,res)=>{
@@ -78,9 +63,19 @@ app.get("/listings/new",(req,res)=>{
 });
 
 //save create route data in database
-app.post("/listings",async(req,res)=>{
+app.post("/listings",wrapAsync(async(req,res,next)=>{
+   //check if listing data exist in req.body
+
+   if(!req.body.listing){
+    throw new ExpressError(400, "Send valid data for listing");
+   }
+   const {title, description, price, country, location}= req.body.listing;
+   if(!title || ! description || !price || !country || !location){
+    throw new ExpressError(400,"Listing is missing required fields");
+   }
+   
     let data=req.body.listing;
-    console.log(req.body.listing);
+    
     // Handle image field if it's a string
     if (data.image && typeof data.image === "string") {
         data.image = {
@@ -90,57 +85,63 @@ app.post("/listings",async(req,res)=>{
     }
      // Convert price to number
     data.price = data.price ? Number(data.price) : 0;
-     try {
-    await Listing.create(data); // ✅ correct Mongoose method
+     
+    await Listing.create(data); // save data in db
     console.log("Listing created:", data);
     res.redirect("/listings");
-    } catch (err) {
-        console.error("Error creating listing:", err);
-        res.status(500).send("Error creating listing");
-    }
-
-    // await Listing.insertOne(data);
-    // res.redirect("/listings")
-});
+    
+}));
 
 
 //Read- Show Route
 // work- Return data of specific id 
-app.get("/listings/:id", async(req,res)=>{
+app.get("/listings/:id", wrapAsync(async(req,res)=>{
     let{id}= req.params;
     //fetch data using id
     let data= await Listing.findById(id);
     res.render("listings/show.ejs",{data});
-});
+}));
 
 
 //Update
 //Edit and update route
 //edit route
-app.get("/listings/:id/edit",async(req,res)=>{
+app.get("/listings/:id/edit",wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let data= await Listing.findById(id);
-    console.log(req.params);
-    console.log(data);
     
     res.render("listings/edit.ejs",{data});
-});
+}));
 
 //Update data
-app.put("/listings/:id",async(req,res)=>{
-    // let data=req.body.listing;
+app.put("/listings/:id",wrapAsync(async(req,res)=>{
+    if(!req.body.listing){
+        throw new ExpressError(400,"Enter valid data for listing");
+    }
+    let{title, description,image,price,country,location}= req.body.listing;
+    if(!title || !description || !image || !price || !country || !location){
+        throw new ExpressError(400, "Please enter required data for listing");
+    }
     let {id}= req.params;
     //Extract object:  req.body.listing
     await Listing.findByIdAndUpdate(id,{ ...req.body.listing },{runValidators:true});
     res.redirect(`/listings/${id}`);
-});
+}));
 
 //delete route
-app.delete("/listings/:id",async(req,res)=>{
+app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let deletedData=await Listing.findByIdAndDelete(id);
     console.log(deletedData);
     res.redirect("/listings");
+}));
+
+
+
+//error handling
+app.use((err, req,res, next)=>{
+    let{statusCode=500, message="Something went wrong"}= err;
+    res.status(statusCode).send(message);
 });
 
 
