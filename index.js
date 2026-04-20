@@ -38,6 +38,22 @@ main()
 .then(()=>{console.log("Database connection successful.");})
 .catch((err)=>{console.log(err);});
 
+const validateFunction= (req,res,next)=>{
+    // let result=listingSchema.validate(req.body);
+    // console.log(result);
+    console.log("Incoming body: ", req.body);
+   let{ value,error}= listingSchema.validate(req.body);
+   if(error){
+    let errMsg= error.details.map((el)=>el.message).join(",");
+    throw new ExpressError(400, errMsg);
+   }
+   else{
+    req.body= value;
+    next();
+   }
+   
+};
+
 app.listen(8080,()=>{
     console.log("Listening on port 8080");
 });
@@ -64,17 +80,9 @@ app.get("/listings/new",(req,res)=>{
 });
 
 //save create route data in database
-app.post("/listings",wrapAsync(async(req,res,next)=>{
-     
-   let result=listingSchema.validate(req.body);
-    console.log(result);
-   let{ value,error}= listingSchema.validate(req.body);
-   if(error){
-    let errMsg= error.details.map((el)=>el.message).join(",");
-    throw new ExpressError(400, errMsg);
-   }
+app.post("/listings", validateFunction,wrapAsync(async(req,res,next)=>{
    
-    let newListing= await Listing.create(value.listing); // save data in db
+    let newListing= await Listing.create(req.body.listing); // save data in db
     console.log("Listing created:", newListing);
     res.redirect("/listings");
     
@@ -102,15 +110,10 @@ app.get("/listings/:id/edit",wrapAsync(async(req,res)=>{
 }));
 
 //Update data
-app.put("/listings/:id",wrapAsync(async(req,res)=>{
+app.put("/listings/:id",validateFunction, wrapAsync(async(req,res)=>{
     let {id}= req.params;
-    let {value, error}= listingSchema.validate(req.body);
-    if(error){
-        let errMsg= error.details.map((el)=>el.message).join(",");
-        throw new ExpressError(400, errMsg);
-    }
-   
-    let updatedData=await Listing.findByIdAndUpdate(id,{ ...value.listing },{runValidators:true});
+      
+    let updatedData=await Listing.findByIdAndUpdate(id,{ ...req.body.listing },{runValidators:true});
     console.log("new Listing updated",updatedData );
     res.redirect(`/listings/${id}`);
 }));
