@@ -3,6 +3,7 @@ const app= express();
 
 const mongoose= require("mongoose");
 const mongo_url="mongodb://127.0.0.1:27017/wanderlust";
+const {listingSchema}= require("./schema.js");
 
 async function main() {
     await mongoose.connect(mongo_url);
@@ -64,30 +65,17 @@ app.get("/listings/new",(req,res)=>{
 
 //save create route data in database
 app.post("/listings",wrapAsync(async(req,res,next)=>{
-   //check if listing data exist in req.body
-
-   if(!req.body.listing){
-    throw new ExpressError(400, "Send valid data for listing");
-   }
-   const {title, description, price, country, location}= req.body.listing;
-   if(!title || ! description || !price || !country || !location){
-    throw new ExpressError(400,"Listing is missing required fields");
+     
+   let result=listingSchema.validate(req.body);
+    console.log(result);
+   let{ value,error}= listingSchema.validate(req.body);
+   if(error){
+    let errMsg= error.details.map((el)=>el.message).join(",");
+    throw new ExpressError(400, errMsg);
    }
    
-    let data=req.body.listing;
-    
-    // Handle image field if it's a string
-    if (data.image && typeof data.image === "string") {
-        data.image = {
-        url: data.image,
-        filename: "listingimage",
-        };
-    }
-     // Convert price to number
-    data.price = data.price ? Number(data.price) : 0;
-     
-    await Listing.create(data); // save data in db
-    console.log("Listing created:", data);
+    let newListing= await Listing.create(value.listing); // save data in db
+    console.log("Listing created:", newListing);
     res.redirect("/listings");
     
 }));
@@ -115,16 +103,15 @@ app.get("/listings/:id/edit",wrapAsync(async(req,res)=>{
 
 //Update data
 app.put("/listings/:id",wrapAsync(async(req,res)=>{
-    if(!req.body.listing){
-        throw new ExpressError(400,"Enter valid data for listing");
-    }
-    let{title, description,image,price,country,location}= req.body.listing;
-    if(!title || !description || !image || !price || !country || !location){
-        throw new ExpressError(400, "Please enter required data for listing");
-    }
     let {id}= req.params;
-    //Extract object:  req.body.listing
-    await Listing.findByIdAndUpdate(id,{ ...req.body.listing },{runValidators:true});
+    let {value, error}= listingSchema.validate(req.body);
+    if(error){
+        let errMsg= error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400, errMsg);
+    }
+   
+    let updatedData=await Listing.findByIdAndUpdate(id,{ ...value.listing },{runValidators:true});
+    console.log("new Listing updated",updatedData );
     res.redirect(`/listings/${id}`);
 }));
 
