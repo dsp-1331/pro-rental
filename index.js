@@ -137,11 +137,18 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
 }));
 
 
+//Page not found error
+app.use("/{*any}",(req,res,next)=>{
+    throw new ExpressError(404, "Page not found");
+});
+
 
 //error handling
 app.use((err, req,res, next)=>{
     let{statusCode=500, message="Something went wrong"}= err;
-    res.status(statusCode).send(message);
+    // res.status(statusCode).send(message);
+
+    res.status(statusCode).render("error.ejs",{err});
 });
 
 
