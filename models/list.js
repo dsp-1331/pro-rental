@@ -30,7 +30,7 @@ const listSchema= new Schema({
         },
         url: {
             type: String,
-            default: "https://gumlet.io",
+            default: "https://t4.ftcdn.net/jpg/01/28/13/43/360_F_128134342_LrI1CSKCncfyBRPlTayXcGCFm0ys0WOB.jpg",
             // 1. Setter: If user sends an empty string, it forces Mongoose to use the default
             set: (v) => v === "" 
                 ? "https://gumlet.io" 
@@ -54,6 +54,11 @@ const listSchema= new Schema({
     country:{
         type:String
     },
+
+    reviews:[{
+        type: Schema.Types.ObjectId,
+        ref:"Review"
+    }]
 });
 
 

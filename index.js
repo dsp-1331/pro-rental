@@ -34,21 +34,32 @@ const wrapAsync= require("./utils/wrapAsync.js");
 const ExpressError= require("./utils/ExpressError.js");
 
 const Listing= require("./models/list.js");
+const Review= require("./models/review.js");
 main()
-.then(()=>{console.log("Database connection successful.");})
+.then(()=>{
+    console.log("Database connection successful.");
+    console.log("Connected to database: ", mongoose.connection.name);
+})
 .catch((err)=>{console.log(err);});
 
+app.get("/test-db", async (req, res) => {
+    let all = await Listing.find({});
+    res.json(all); // This will show you exactly what is inside the DB
+});
+
+
 const validateFunction= (req,res,next)=>{
-    // let result=listingSchema.validate(req.body);
-    // console.log(result);
-    console.log("Incoming body: ", req.body);
+    let result=listingSchema.validate(req.body);
+    console.log("Result:" ,result);
+    console.log("Incoming body: ", req.body.listing);
    let{ value,error}= listingSchema.validate(req.body);
    if(error){
     let errMsg= error.details.map((el)=>el.message).join(",");
     throw new ExpressError(400, errMsg);
    }
    else{
-    req.body= value;
+    // req.body= value;
+    // console.log("Request body (Value) from validation function", value);    
     next();
    }
    
@@ -67,7 +78,7 @@ app.get("/",(req,res)=>{
 
 //Index Route
 app.get("/listings",wrapAsync(async(req,res)=>{
-   let alldata= await Listing.find();
+   let alldata= await Listing.find({});
 //    console.log(alldata);
    res.render("listings/index.ejs",{alldata});
 
@@ -83,6 +94,10 @@ app.get("/listings/new",(req,res)=>{
 app.post("/listings", validateFunction,wrapAsync(async(req,res,next)=>{
    
     let newListing= await Listing.create(req.body.listing); // save data in db
+    console.log("request body data: ", req.body);
+    console.log("Listing data: ", req.body.listing);
+
+
     console.log("Listing created:", newListing);
     res.redirect("/listings");
     
@@ -126,6 +141,24 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     res.redirect("/listings");
 }));
 
+
+//Review route
+//post route
+app.post("/listings/:id/reviews", async(req,res)=>{
+    let{id}= req.params;
+    let listing= await Listing.findById(id);
+    let newReview= new Review(req.body.review);
+    listing.reviews.push(newReview);
+    //save both in database
+    await newReview.save();
+    await listing.save();
+    console.log("New review saved:", newReview);
+    
+    // res.send("new review saved");
+    res.redirect(`/listings/${id}`);
+
+    
+});
 
 //Page not found error
 app.use("/{*any}",(req,res,next)=>{

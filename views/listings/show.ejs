@@ -11,7 +11,7 @@
        
         <img src="<%=data.image.url%>" class="card-img-top show-img" alt="property image">
         <div class="card-body">
-            <h5 class="card-title"><%= data.title %></h5>
+           
             <p class="card-text">
                 <%= data.description %> <br>
                 &#8377;  <%= data.price ? Number(data.price).toLocaleString("en-IN") : "N/A" %> <br>
@@ -25,10 +25,6 @@
     </div>
 
         
-    
-           
-    </div>
-
     <div class="show-btn offset-3 mb-5">
 
         <a href="/listings/<%=data._id%>/edit" class="btn btn-dark col-md-1 ">Edit</a>
@@ -36,9 +32,37 @@
         <form action="/listings/<%=data._id%>?_method=DELETE" method="post" >
                         <button class="btn btn-dark offset-md-3">Delete</button>
         </form>  
+
+        
            
         
     </div>
+
+     <!-- creating review  -->
+      
+
+      <div class="col-8 offset-3 mb-5 ">
+        <hr>
+        <h4>Leave the Review</h4>
+        <form action="/listings/<%=data._id%>/reviews" method="post">
+            <div class="mb-3">
+                <label for="rating" class="form-label" >Rating</label>
+                <input type="range" min="1" max="5"  name="review[rating]" id= "rating" class="form-range"  >
+            </div>
+            <div class="mb-3">
+                <label for="comment" class="form-label">Comments</label>
+                <textarea name="review[comment]" id="comment" class="form-control" rows="5"  placeholder="Write a review..."></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-outline-dark">Submit </button>
+        </form>
+      </div>
+    
+           
+    </div>
+
+    
+
     
     
 </body>
