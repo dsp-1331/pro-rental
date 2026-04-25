@@ -61,6 +61,8 @@ const listSchema= new Schema({
     }]
 });
 
+//delete listing 
+// const deleteReviews= async()
 
 //create listing model
 const Listing= mongoose.model("Listing",listSchema);

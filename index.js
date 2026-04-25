@@ -160,7 +160,7 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
 
 
 //Review route
-//post route
+//Review post route
 app.post("/listings/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
     let{id}= req.params;
     let listing= await Listing.findById(id);
@@ -175,6 +175,17 @@ app.post("/listings/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
     res.redirect(`/listings/${id}`);
 
     
+}));
+
+//Review Delete Route
+app.delete("/listings/:id/reviews/:reviewId", wrapAsync(async(req,res)=>{
+    let{id, reviewId}= req.params;
+    // Remove the review ID reference from the Listing's reviews array
+    await Listing.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
+    //Delete the actual review document from the Review collection
+    await Review.findByIdAndDelete(reviewId);
+    
+    res.redirect(`/listings/${id}`)
 }));
 
 //Page not found error
