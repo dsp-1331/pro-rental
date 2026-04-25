@@ -126,7 +126,7 @@ app.post("/listings", validateFunction,wrapAsync(async(req,res,next)=>{
 app.get("/listings/:id", wrapAsync(async(req,res)=>{
     let{id}= req.params;
     //fetch data using id
-    let data= await Listing.findById(id);
+    let data= await Listing.findById(id).populate("reviews");
     res.render("listings/show.ejs",{data});
 }));
 
