@@ -150,11 +150,11 @@ app.put("/listings/:id",validateFunction, wrapAsync(async(req,res)=>{
     res.redirect(`/listings/${id}`);
 }));
 
-//delete route
+//listing delete route
 app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let deletedData=await Listing.findByIdAndDelete(id);
-    console.log(deletedData);
+    console.log("Deleted data from router:" ,deletedData);
     res.redirect("/listings");
 }));
 

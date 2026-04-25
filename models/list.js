@@ -1,5 +1,6 @@
 const mongoose= require("mongoose");
-
+//require Review model
+const Review= require("./review");
 const Schema= mongoose.Schema;
 //create schema
 const listSchema= new Schema({
@@ -11,17 +12,6 @@ const listSchema= new Schema({
         type:String
     },
    
-//     image: {
-//     filename: {
-//       type: String,
-//       default: "listingimage",
-//     },
-//     url: {
-//       type: String,
-//       default:
-//         "https://clubmahindra.gumlet.io/blog/media/section_images/shuttersto-6d71496a31ac52b.jpg?w=376&dpr=2.6",
-//     }
-// },
 
     image: {
         filename: {
@@ -61,8 +51,18 @@ const listSchema= new Schema({
     }]
 });
 
-//delete listing 
-// const deleteReviews= async()
+//delete listing and their associated reviews from the database 
+//using mongoose middleware
+
+listSchema.post('findOneAndDelete', async(listing)=>{
+console.log("Post mongoose middlware is called");
+if(listing){
+   await Review.deleteMany({_id: {$in: listing.reviews}});
+  
+}
+
+});
+
 
 //create listing model
 const Listing= mongoose.model("Listing",listSchema);
