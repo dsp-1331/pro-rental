@@ -3,7 +3,8 @@ const app= express();
 
 const mongoose= require("mongoose");
 const mongo_url="mongodb://127.0.0.1:27017/wanderlust";
-const {listingSchema}= require("./schema.js");
+//rquire listingSchema and reviewSchema for server side validation
+const {listingSchema, reviewSchema}= require("./schema.js");
 
 async function main() {
     await mongoose.connect(mongo_url);
@@ -47,11 +48,11 @@ app.get("/test-db", async (req, res) => {
     res.json(all); // This will show you exactly what is inside the DB
 });
 
-
+//this function is used for the validate data for server side validation 
 const validateFunction= (req,res,next)=>{
-    let result=listingSchema.validate(req.body);
-    console.log("Result:" ,result);
-    console.log("Incoming body: ", req.body.listing);
+    // let result=listingSchema.validate(req.body);
+    // console.log("Result:" ,result);
+    // console.log("Incoming body: ", req.body.listing);
    let{ value,error}= listingSchema.validate(req.body);
    if(error){
     let errMsg= error.details.map((el)=>el.message).join(",");
@@ -63,6 +64,22 @@ const validateFunction= (req,res,next)=>{
     next();
    }
    
+};
+
+//this function is for the server side review validation
+const validateReview= (req,res,next)=>{
+    let result= reviewSchema.validate(req.body);
+    console.log("Result: ", result);
+    console.log("Output: ", req.body);
+    let {error}= reviewSchema.validate(req.body);
+    if(error){
+        let errMsg= error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400, errMsg);
+    }
+    else{
+        next();
+    }
+    
 };
 
 app.listen(8080,()=>{
@@ -144,7 +161,7 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
 
 //Review route
 //post route
-app.post("/listings/:id/reviews", async(req,res)=>{
+app.post("/listings/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
     let{id}= req.params;
     let listing= await Listing.findById(id);
     let newReview= new Review(req.body.review);
@@ -158,7 +175,7 @@ app.post("/listings/:id/reviews", async(req,res)=>{
     res.redirect(`/listings/${id}`);
 
     
-});
+}));
 
 //Page not found error
 app.use("/{*any}",(req,res,next)=>{
