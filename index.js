@@ -7,6 +7,25 @@ const mongo_url="mongodb://127.0.0.1:27017/wanderlust";
 //rquire listingSchema and reviewSchema for server side validation
 const {listingSchema, reviewSchema}= require("./schema.js");
 
+//require express session 
+const session = require("express-session");
+const flash= require("connect-flash");
+const sessionOptions= {
+    secret:"mysupersecret",
+    resave: false,
+    saveUninitialized: true,
+    cookie:{
+        expires: Date.now()+ 7*24*60*60*1000,
+        maxAge: 7*24*60*60*1000,
+        httpOnly: true,
+        // secure: true // Only sends cookie over HTTPS
+    },
+};
+app.use(session(sessionOptions));
+app.use(flash());
+
+
+
 
 async function main() {
     await mongoose.connect(mongo_url);
@@ -49,6 +68,15 @@ main()
     console.log("Connected to database: ", mongoose.connection.name);
 })
 .catch((err)=>{console.log(err);});
+
+// ensure that every single EJS page in your app has access to the success
+//  variable without you having to pass it manually in every res.render.
+
+app.use((req,res,next)=>{
+    res.locals.success= req.flash("success");
+    res.locals.error= req.flash("error");
+    next();
+});
 
 app.get("/test-db", async (req, res) => {
     let all = await Listing.find({});

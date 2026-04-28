@@ -47,8 +47,8 @@ router.post("/", validateFunction,wrapAsync(async(req,res,next)=>{
     let newListing= await Listing.create(req.body.listing); // save data in db
     console.log("request body data: ", req.body);
     console.log("Listing data: ", req.body.listing);
-
-
+    req.flash("success", "Listing cretaed successfully!!");
+   
     console.log("Listing created:", newListing);
     res.redirect("/listings");
     
@@ -61,6 +61,11 @@ router.get("/:id", wrapAsync(async(req,res)=>{
     let{id}= req.params;
     //fetch data using id
     let data= await Listing.findById(id).populate("reviews");
+    //when listing doesnt exist send flash msg
+    if(!data){
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
+    }
     res.render("listings/show.ejs",{data});
 }));
 
@@ -71,6 +76,10 @@ router.get("/:id", wrapAsync(async(req,res)=>{
 router.get("/:id/edit",wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let data= await Listing.findById(id);
+    if(!data){
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
+    }
     
     res.render("listings/edit.ejs",{data});
 }));
@@ -81,6 +90,7 @@ router.put("/:id",validateFunction, wrapAsync(async(req,res)=>{
       
     let updatedData=await Listing.findByIdAndUpdate(id,{ ...req.body.listing },{runValidators:true});
     console.log("new Listing updated",updatedData );
+    req.flash("success", "Listing is updated!!");
     res.redirect(`/listings/${id}`);
 }));
 
@@ -89,6 +99,8 @@ router.delete("/:id",wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let deletedData=await Listing.findByIdAndDelete(id);
     console.log("Deleted data from router:" ,deletedData);
+    //flash msg when listing deleted
+    req.flash("success", "Listing is deleted!!");
     res.redirect("/listings");
 }));
 
