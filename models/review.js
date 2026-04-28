@@ -16,7 +16,11 @@ const reviewSchema= new Schema({
     createdAt:{
         type:Date,
         default: Date.now // Pass the function dont call it 
-    }
+    },
+    author:{
+        type:Schema.Types.ObjectId,
+        ref: "User"
+    },
 });
 
 //create model and export

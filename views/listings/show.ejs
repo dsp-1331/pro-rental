@@ -11,38 +11,38 @@
        
         <img src="<%=data.image.url%>" class="card-img-top show-img" alt="property image">
         <div class="card-body">
-           
-            <p class="card-text">
-                <%= data.description %> <br>
-                &#8377;  <%= data.price ? Number(data.price).toLocaleString("en-IN") : "N/A" %> <br>
-                <%= data.location %> <br>
-                <%= data.country %> <br>
-            </p>
+            <p class="card-text">Owned by <i><%= data.owner.username %></i></p>
+          
+            <p class="card-text"> <%= data.description %> </p>
+            <p class="card-text">  &#8377;  <%= data.price ? Number(data.price).toLocaleString("en-IN") : "N/A" %> </p>
+            <p class="card-text">   <%= data.location %> </p>
+            <p class="card-text">    <%= data.country %> </p>
            
         </div>
 
 
     </div>
 
-        
-    <div class="show-btn offset-3 mb-5">
+        <%if(currUser && currUser._id.equals( data.owner._id)  ){ %>
+             <div class="show-btn offset-3 mb-5">
 
-        <a href="/listings/<%=data._id%>/edit" class="btn btn-dark col-md-1 ">Edit</a>
+                <a href="/listings/<%=data._id%>/edit" class="btn btn-dark col-md-1 ">Edit</a>
 
-        <form action="/listings/<%=data._id%>?_method=DELETE" method="post" >
-                        <button class="btn btn-dark offset-md-3">Delete</button>
-        </form>  
+                <form action="/listings/<%=data._id%>?_method=DELETE" method="post" >
+                                <button class="btn btn-dark offset-md-3">Delete</button>
+                </form>  
 
-        
-           
-        
-    </div>
+            </div>
+            <hr>
+        <% } %>
+   
 
      <!-- creating review  -->
       
-
+       
       <div class="col-8 offset-3 mb-5 " >
-        <hr>
+       
+        <%if(currUser  ){ %>
         <h4><b> Leave the Review </b></h4>
         <form action="/listings/<%=data._id%>/reviews" method="post" class="needs-validation" novalidate>
             <div class="mb-3">
@@ -61,6 +61,8 @@
             <button type="submit" class="btn btn-outline-dark">Submit </button>
         </form>
 
+        <% } %>
+
          <!-- displaying all the review below  -->
           <hr>
           <h4><b>All Reviews</b></h4>
@@ -70,7 +72,7 @@
             <% for (let review of data.reviews){ %>
                 <div class="card  mb-3 col-5 ms-3">
                     <div class="card-body ">
-                         <h5 class="card-title">John Dea</h5>
+                         <h5 class="card-title">@<%= review.author.username %></h5>
                          <p class="card-text"><%= review.comment %></p>
                          <p class="card-text"><%= review.rating %> stars</p>
 

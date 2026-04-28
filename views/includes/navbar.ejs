@@ -11,6 +11,20 @@
         <a class="nav-link" href="/listings/new">Add New Listing</a>
        
       </div>
+        <!-- for signup login and logout -->
+      <div class="navbar-nav ms-auto">
+        <% if(!currUser){ %>
+           <!-- Links to show when logged OUT -->
+          <a class="nav-link " aria-current="page" href="/signup">Sign Up</a>
+          <a class="nav-link " href="/login">Log in</a>
+       <% } %>
+        
+       <% if(currUser){ %>
+        <!-- Links to show when logged IN -->
+        <a class="nav-link" href="/logout">Log out</a>
+
+       <% } %>
+      </div>
     </div>
   </div>
 </nav>

@@ -23,13 +23,13 @@ const listSchema= new Schema({
             default: "https://t4.ftcdn.net/jpg/01/28/13/43/360_F_128134342_LrI1CSKCncfyBRPlTayXcGCFm0ys0WOB.jpg",
             // 1. Setter: If user sends an empty string, it forces Mongoose to use the default
             set: (v) => v === "" 
-                ? "https://gumlet.io" 
+                ? "https://t4.ftcdn.net/jpg/01/28/13/43/360_F_128134342_LrI1CSKCncfyBRPlTayXcGCFm0ys0WOB.jpg" 
                 : v,
-            // 2. Validator: Ensures the string looks like an image link
-            match: [
-                /\.(jpg|jpeg|png|gif|webp|avif)(\?.*)?$/i,
-                "Please enter a valid image URL (jpg, png, etc.)"
-            ]
+            // // 2. Validator: Ensures the string looks like an image link
+            // match: [
+            //     /\.(jpg|jpeg|png|gif|webp|avif)(\?.*)?$/i,
+            //     "Please enter a valid image URL (jpg, png, etc.)"
+            // ]
         }
     },
 
@@ -48,7 +48,12 @@ const listSchema= new Schema({
     reviews:[{
         type: Schema.Types.ObjectId,
         ref:"Review"
-    }]
+    }],
+
+    owner:{
+        type:Schema.Types.ObjectId,
+        ref:"User"
+    }
 });
 
 //delete listing and their associated reviews from the database 

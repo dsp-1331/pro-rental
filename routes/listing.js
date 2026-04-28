@@ -2,29 +2,12 @@ const express= require('express');
 const router= express.Router();
 //import wrapAsync
 const wrapAsync= require("../utils/wrapAsync.js");
-//rquire listingSchema and reviewSchema for server side validation
-const {listingSchema, reviewSchema}= require("../schema.js");
-//import ExpressError
-const ExpressError= require("../utils/ExpressError.js");
-const Listing= require("../models/list.js");
 
-//this function is used for the validate data for server side validation 
-const validateFunction= (req,res,next)=>{
-    // let result=listingSchema.validate(req.body);
-    // console.log("Result:" ,result);
-    // console.log("Incoming body: ", req.body.listing);
-   let{ value,error}= listingSchema.validate(req.body);
-   if(error){
-    let errMsg= error.details.map((el)=>el.message).join(",");
-    throw new ExpressError(400, errMsg);
-   }
-   else{
-    // req.body= value;
-    // console.log("Request body (Value) from validation function", value);    
-    next();
-   }
-   
-};
+
+const Listing= require("../models/list.js");
+const {isLoggedIn, isOwner, validateListing }= require("../middleware.js");
+
+
 
 
 //Index Route
@@ -36,17 +19,24 @@ router.get("/",wrapAsync(async(req,res)=>{
 }));
 
 //Create route
-router.get("/new",(req,res)=>{
-    console.log("Create route");
+router.get("/new", isLoggedIn, (req,res)=>{
+    
+   //checking is user is logged in before creating listing
+   
     res.render("listings/new.ejs");
 });
 
 //save create route data in database
-router.post("/", validateFunction,wrapAsync(async(req,res,next)=>{
-   
-    let newListing= await Listing.create(req.body.listing); // save data in db
-    console.log("request body data: ", req.body);
-    console.log("Listing data: ", req.body.listing);
+router.post("/",isLoggedIn,  validateListing ,wrapAsync(async(req,res,next)=>{
+     // 1. Create the instance but DON'T use Listing.create() yet
+    let newListing = new Listing(req.body.listing);
+    // console.log( "Req user: ",req.user);
+     // 2. Assign the owner
+    newListing.owner = req.user._id;
+     // 3. Save it to the database
+    await newListing.save(); 
+  
+    newListing.owner= req.user._id;
     req.flash("success", "Listing cretaed successfully!!");
    
     console.log("Listing created:", newListing);
@@ -60,12 +50,19 @@ router.post("/", validateFunction,wrapAsync(async(req,res,next)=>{
 router.get("/:id", wrapAsync(async(req,res)=>{
     let{id}= req.params;
     //fetch data using id
-    let data= await Listing.findById(id).populate("reviews");
+    let data= await Listing.findById(id)
+    .populate({
+        path:"reviews",populate:{
+            path: "author"
+        },
+    }).populate("owner");
     //when listing doesnt exist send flash msg
+
     if(!data){
         req.flash("error", "Listing you requested for does not exist!");
         return res.redirect("/listings");
     }
+    console.log("Display show route:", data);
     res.render("listings/show.ejs",{data});
 }));
 
@@ -73,7 +70,8 @@ router.get("/:id", wrapAsync(async(req,res)=>{
 //Update
 //Edit and update route
 //edit route
-router.get("/:id/edit",wrapAsync(async(req,res)=>{
+//checking user is logged in for make changes 
+router.get("/:id/edit", isLoggedIn,isOwner ,wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let data= await Listing.findById(id);
     if(!data){
@@ -85,9 +83,8 @@ router.get("/:id/edit",wrapAsync(async(req,res)=>{
 }));
 
 //Update data
-router.put("/:id",validateFunction, wrapAsync(async(req,res)=>{
+router.put("/:id", isLoggedIn,isOwner, validateListing , wrapAsync(async(req,res)=>{
     let {id}= req.params;
-      
     let updatedData=await Listing.findByIdAndUpdate(id,{ ...req.body.listing },{runValidators:true});
     console.log("new Listing updated",updatedData );
     req.flash("success", "Listing is updated!!");
@@ -95,7 +92,7 @@ router.put("/:id",validateFunction, wrapAsync(async(req,res)=>{
 }));
 
 //listing delete route
-router.delete("/:id",wrapAsync(async(req,res)=>{
+router.delete("/:id", isLoggedIn,isOwner ,wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let deletedData=await Listing.findByIdAndDelete(id);
     console.log("Deleted data from router:" ,deletedData);
